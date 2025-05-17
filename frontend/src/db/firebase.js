@@ -5,7 +5,9 @@ const firebaseConfig = {
   apiKey: "AIzaSyD4l3i5d4dSnjJmBVPSnB2WpuDncc2rojM",
   authDomain: "paf45-aadab.firebaseapp.com",
   projectId: "paf45-aadab",
-  storageBucket: "paf45-aadab.appspot.com", // ✅ Correct bucket format
+  // storageBucket: "paf45-aadab.appspot.com",
+  storageBucket: "paf45-aadab.firebasestorage.app",
+
   messagingSenderId: "633984234657",
   appId: "1:633984234657:web:35e5111ee382250a446ce0",
 };
