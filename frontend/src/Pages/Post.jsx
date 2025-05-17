@@ -333,7 +333,7 @@ const Post = () => {
                 label="Topic"
                 {...register("title")}
                 isInvalid={errors.title}
-                className="mb-1 resize-none w-full border border-gray-400 focus:outline-blue-700 rounded-lg p-5 bg-gray-800 text-neutral-200"
+                className="mb-1 resize-none w-full border border-gray-400 focus:outline-blue-700 rounded-lg p-5 bg-gray-800 text-white"
               ></TEInput>
               {errors.title && (
                 <p className="text-xs mt-1 mb-1 text-red-500">
