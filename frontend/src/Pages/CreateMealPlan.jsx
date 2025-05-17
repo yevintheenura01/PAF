@@ -31,14 +31,116 @@ const CreateMealPlan = () => {
 
   const { mealPlanId } = useParams();
 
+    // Add validation state variables
+  const [errors, setErrors] = useState({
+    recipes: "",
+    ingredients: "",
+    cookingInstruction: "",
+    nutritionalInformation: "",
+    portionSizes: "",
+    date: "",
+    image: ""
+  });
+
+  // Add validation function
+  const validateForm = () => {
+    let tempErrors = {};
+    let isValid = true;
+
+    if (!selectedMealType) {
+      tempErrors.mealType = "Meal type is required";
+      isValid = false;
+    }
+
+    if (!selectedDietaryPreference) {
+      tempErrors.dietaryPreference = "Dietary preference is required";
+      isValid = false;
+    }
+
+    if (!recipes.trim()) {
+      tempErrors.recipes = "Recipe name is required";
+      isValid = false;
+    } else if (recipes.length < 3) {
+      tempErrors.recipes = "Recipe name must be at least 3 characters";
+      isValid = false;
+    }
+
+    if (!ingredients.trim()) {
+      tempErrors.ingredients = "Ingredients are required";
+      isValid = false;
+    } else if (ingredients.length < 10) {
+      tempErrors.ingredients = "Please provide a more detailed list of ingredients";
+      isValid = false;
+    }
+
+    if (!cookingInstruction.trim()) {
+      tempErrors.cookingInstruction = "Cooking instructions are required";
+      isValid = false;
+    } else if (cookingInstruction.length < 20) {
+      tempErrors.cookingInstruction = "Please provide more detailed cooking instructions";
+      isValid = false;
+    }
+
+    if (!nutritionalInformation.trim()) {
+      tempErrors.nutritionalInformation = "Nutritional information is required";
+      isValid = false;
+    }
+
+    if (!portionSizes) {
+      tempErrors.portionSizes = "Portion size is required";
+      isValid = false;
+    } else if (isNaN(portionSizes) || parseInt(portionSizes) <= 0) {
+      tempErrors.portionSizes = "Portion size must be a positive number";
+      isValid = false;
+    }
+
+    if (!date) {
+      tempErrors.date = "Date is required";
+      isValid = false;
+    } else {
+      const selectedDate = new Date(date);
+      const today = new Date();
+      
+      if (selectedDate < new Date(today.setHours(0,0,0,0))) {
+        tempErrors.date = "Date cannot be in the past";
+        isValid = false;
+      }
+    }
+
+    if (!image && !source) {
+      tempErrors.image = "Please upload an image";
+      isValid = false;
+    }
+
+    setErrors(tempErrors);
+    return isValid;
+  };
+
+  // Update the onImageChange function to include validation
   const onImageChange = (e) => {
     const selectedFiles = e.target.files;
+    setErrors({...errors, image: ""});
 
     if (!selectedFiles || selectedFiles.length === 0) {
-      toast.error("Please select at least one image");
+      setErrors({...errors, image: "Please select an image"});
+      return;
     }
 
     const currentFile = selectedFiles[0];
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!validTypes.includes(currentFile.type)) {
+      setErrors({...errors, image: "File must be JPEG, JPG or PNG"});
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (currentFile.size > 5 * 1024 * 1024) {
+      setErrors({...errors, image: "Image size should be less than 5MB"});
+      return;
+    }
+    
     setImage(currentFile);
   };
 
