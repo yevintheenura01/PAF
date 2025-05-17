@@ -31,7 +31,7 @@ const CreateMealPlan = () => {
 
   const { mealPlanId } = useParams();
 
-    // Add validation state variables
+  // Add validation state variables
   const [errors, setErrors] = useState({
     recipes: "",
     ingredients: "",
@@ -39,7 +39,7 @@ const CreateMealPlan = () => {
     nutritionalInformation: "",
     portionSizes: "",
     date: "",
-    image: ""
+    image: "",
   });
 
   // Add validation function
@@ -69,7 +69,8 @@ const CreateMealPlan = () => {
       tempErrors.ingredients = "Ingredients are required";
       isValid = false;
     } else if (ingredients.length < 10) {
-      tempErrors.ingredients = "Please provide a more detailed list of ingredients";
+      tempErrors.ingredients =
+        "Please provide a more detailed list of ingredients";
       isValid = false;
     }
 
@@ -77,7 +78,8 @@ const CreateMealPlan = () => {
       tempErrors.cookingInstruction = "Cooking instructions are required";
       isValid = false;
     } else if (cookingInstruction.length < 20) {
-      tempErrors.cookingInstruction = "Please provide more detailed cooking instructions";
+      tempErrors.cookingInstruction =
+        "Please provide more detailed cooking instructions";
       isValid = false;
     }
 
@@ -100,8 +102,8 @@ const CreateMealPlan = () => {
     } else {
       const selectedDate = new Date(date);
       const today = new Date();
-      
-      if (selectedDate < new Date(today.setHours(0,0,0,0))) {
+
+      if (selectedDate < new Date(today.setHours(0, 0, 0, 0))) {
         tempErrors.date = "Date cannot be in the past";
         isValid = false;
       }
@@ -119,28 +121,28 @@ const CreateMealPlan = () => {
   // Update the onImageChange function to include validation
   const onImageChange = (e) => {
     const selectedFiles = e.target.files;
-    setErrors({...errors, image: ""});
+    setErrors({ ...errors, image: "" });
 
     if (!selectedFiles || selectedFiles.length === 0) {
-      setErrors({...errors, image: "Please select an image"});
+      setErrors({ ...errors, image: "Please select an image" });
       return;
     }
 
     const currentFile = selectedFiles[0];
-    
+
     // Validate file type
-    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
     if (!validTypes.includes(currentFile.type)) {
-      setErrors({...errors, image: "File must be JPEG, JPG or PNG"});
+      setErrors({ ...errors, image: "File must be JPEG, JPG or PNG" });
       return;
     }
-    
+
     // Validate file size (max 5MB)
     if (currentFile.size > 5 * 1024 * 1024) {
-      setErrors({...errors, image: "Image size should be less than 5MB"});
+      setErrors({ ...errors, image: "Image size should be less than 5MB" });
       return;
     }
-    
+
     setImage(currentFile);
   };
 
@@ -173,10 +175,20 @@ const CreateMealPlan = () => {
     setUser(user);
   }, []);
 
+  // Update the handleSubmit function to use validation
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Run validation before proceeding
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
+      return;
+    }
+
     setIsLoading(true);
     if (!user) {
+      setIsLoading(false);
+      toast.error("User not logged in");
       return;
     }
 
@@ -296,100 +308,160 @@ const CreateMealPlan = () => {
 
   return (
     <Layout>
-       <div
+      <div
         className="min-h-screen p-4 bg-cover bg-center"
         style={{ backgroundImage: `url(${CreateBG})` }}
       >
-        
-
         <form onSubmit={handleSubmit}>
-          
           <div className="max-w-xl mx-auto bg-gray-800 p-6 rounded-lg shadow-md">
             <h1 className="text-3xl font-bold mb-6 text-center text-neutral-200">
               {editMealPlans ? "Edit Meal Plan" : "Create Meal Plan"}
             </h1>
             <div className="relative md:w-96">
-            <label
-                  htmlFor="mealType"
-                  className="block text-sm font-medium text-neutral-200 items-center "
-                >
-                 Select Meal Type
-                </label>
+              <label
+                htmlFor="mealType"
+                className="block text-sm font-medium text-neutral-200 items-center"
+              >
+                Select Meal Type
+              </label>
               <select
                 name="mealType"
-                className="border rounded h-10 w-full p-2 mt-4 bg-gray-800 text-neutral-200"
+                className={`border rounded h-10 w-full p-2 mt-4 bg-gray-800 text-neutral-200 ${
+                  errors.mealType ? "border-red-500" : ""
+                }`}
                 value={selectedMealType}
-                onChange={(e) => setSelectedMealType(e.target.value)}
+                onChange={(e) => {
+                  setSelectedMealType(e.target.value);
+                  setErrors({ ...errors, mealType: "" });
+                }}
               >
                 <option value="breakfast">Breakfast</option>
                 <option value="lunch">Lunch</option>
                 <option value="dinner">Dinner</option>
                 <option value="snack">Snack</option>
               </select>
+              {errors.mealType && (
+                <p className="text-red-500 text-xs mt-1">{errors.mealType}</p>
+              )}
             </div>
 
             <div className="relative md:w-96 mt-2">
-            <label
-                  htmlFor="dietaryPreferences"
-                  className="block text-sm font-medium text-neutral-200 items-center"
-                >
-                 Select Dietary Preferences
-                </label>
+              <label
+                htmlFor="dietaryPreferences"
+                className="block text-sm font-medium text-neutral-200 items-center"
+              >
+                Select Dietary Preferences
+              </label>
               <select
                 name="dietaryPreferences"
-                className="border rounded h-10 w-full p-2 mt-4 bg-gray-800 text-neutral-200"
+                className={`border rounded h-10 w-full p-2 mt-4 bg-gray-800 text-neutral-200 ${
+                  errors.dietaryPreference ? "border-red-500" : ""
+                }`}
                 value={selectedDietaryPreference}
-                onChange={(e) => setSelectedDietaryPreference(e.target.value)}
+                onChange={(e) => {
+                  setSelectedDietaryPreference(e.target.value);
+                  setErrors({ ...errors, dietaryPreference: "" });
+                }}
               >
                 <option value="vegan">Vegan</option>
                 <option value="vegetarian">Vegetarian</option>
                 <option value="keto">Keto</option>
                 <option value="gluten-free">Gluten-Free</option>
               </select>
+              {errors.dietaryPreference && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.dietaryPreference}
+                </p>
+              )}
             </div>
 
             <TEInput
               type="text"
               label="Recipes Name"
-              className="my-4 bg-gray-800 text-white"
+              className={`my-4 bg-gray-800 text-white ${
+                errors.recipes ? "border-red-500" : ""
+              }`}
               value={recipes}
-              onChange={(e) => setRecipes(e.target.value)}
+              onChange={(e) => {
+                setRecipes(e.target.value);
+                setErrors({ ...errors, recipes: "" });
+              }}
             ></TEInput>
+            {errors.recipes && (
+              <p className="text-red-500 text-xs mt-1">{errors.recipes}</p>
+            )}
 
             <TETextarea
               value={ingredients}
-              onChange={(e) => setIngredients(e.target.value)}
-              className="my-5 bg-gray-800 text-white"
+              onChange={(e) => {
+                setIngredients(e.target.value);
+                setErrors({ ...errors, ingredients: "" });
+              }}
+              className={`my-5 bg-gray-800 text-white ${
+                errors.ingredients ? "border-red-500" : ""
+              }`}
               id="ingredients"
               label="Ingredients"
               rows={3}
             ></TETextarea>
+            {errors.ingredients && (
+              <p className="text-red-500 text-xs mt-1">{errors.ingredients}</p>
+            )}
 
             <TETextarea
               value={cookingInstruction}
-              onChange={(e) => setCookingInstruction(e.target.value)}
-              className="my-5 bg-gray-800 text-white"
+              onChange={(e) => {
+                setCookingInstruction(e.target.value);
+                setErrors({ ...errors, cookingInstruction: "" });
+              }}
+              className={`my-5 bg-gray-800 text-white ${
+                errors.cookingInstruction ? "border-red-500" : ""
+              }`}
               id="cooking-instruction"
               label="Cooking Instruction"
               rows={4}
             ></TETextarea>
+            {errors.cookingInstruction && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.cookingInstruction}
+              </p>
+            )}
 
             <TETextarea
               value={nutritionalInformation}
-              onChange={(e) => setNutritionalInformation(e.target.value)}
-              className="my-5 bg-gray-800 text-white"
+              onChange={(e) => {
+                setNutritionalInformation(e.target.value);
+                setErrors({ ...errors, nutritionalInformation: "" });
+              }}
+              className={`my-5 bg-gray-800 text-white ${
+                errors.nutritionalInformation ? "border-red-500" : ""
+              }`}
               id="nutritional-info"
               label="Nutritional Information"
               rows={2}
             ></TETextarea>
+            {errors.nutritionalInformation && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.nutritionalInformation}
+              </p>
+            )}
 
             <TEInput
               type="number"
               label="Portion Sizes (g - gram)"
-              className="my-5 bg-gray-800 text-white"
+              className={`my-5 bg-gray-800 text-white ${
+                errors.portionSizes ? "border-red-500" : ""
+              }`}
               value={portionSizes}
-              onChange={(e) => setPortionSizes(e.target.value)}
+              onChange={(e) => {
+                setPortionSizes(e.target.value);
+                setErrors({ ...errors, portionSizes: "" });
+              }}
+              min="1"
             ></TEInput>
+            {errors.portionSizes && (
+              <p className="text-red-500 text-xs mt-1">{errors.portionSizes}</p>
+            )}
 
             <div className="mb-3 w-96">
               <label
@@ -399,19 +471,33 @@ const CreateMealPlan = () => {
                 Upload picture of your meal
               </label>
               <input
-                className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-200 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-gray-800 file:px-3 file:py-[0.32rem] file:text-neutral-200 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-100 dark:focus:border-primary"
+                className={`relative m-0 block w-full min-w-0 flex-auto rounded border border-solid px-3 py-[0.32rem] text-base font-normal text-neutral-200 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-gray-800 file:px-3 file:py-[0.32rem] file:text-neutral-200 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-100 dark:focus:border-primary ${
+                  errors.image ? "border-red-500" : "border-neutral-300"
+                }`}
                 type="file"
                 id="formFile"
+                accept="image/png, image/jpeg, image/jpg"
                 onChange={onImageChange}
               />
+              {errors.image && (
+                <p className="text-red-500 text-xs mt-1">{errors.image}</p>
+              )}
             </div>
 
             <TEInput
               type="date"
-              className="my-5 text-white"
+              className={`my-5 text-white ${
+                errors.date ? "border-red-500" : ""
+              }`}
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) => {
+                setDate(e.target.value);
+                setErrors({ ...errors, date: "" });
+              }}
             ></TEInput>
+            {errors.date && (
+              <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+            )}
 
             {image && (
               <img
@@ -428,6 +514,7 @@ const CreateMealPlan = () => {
             <button
               type="submit"
               className="w-full mt-6 px-4 py-2 text-sm font-medium text-neutral-200 bg-yellow-500 rounded-md shadow hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2"
+              disabled={isLoading}
             >
               {isLoading ? "Loading..." : editMealPlans ? "Update" : "Create"}
             </button>
